@@ -5,9 +5,7 @@ import './login.css';
 
 class Login extends React.Component {
 
-    constructor(props) {
-        super(props);
-    }
+    
 
     async populateWeatherData(e) {
         const response = await fetch('weatherforecast');
