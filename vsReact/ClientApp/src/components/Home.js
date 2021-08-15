@@ -14,8 +14,9 @@ export class Home extends Component {
         password: document.getElementById('inputPassword').value
       }),
     });
-    //const data = await response.json();
-    document.location = "/fetch-data";
+      const data = await response.json();
+      if (data !== null)
+        document.location = "/fetch-data";
   }
 
   render() {
