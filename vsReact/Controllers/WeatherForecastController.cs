@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -18,14 +19,19 @@ namespace vsReact.Controllers
 
         private readonly ILogger<WeatherForecastController> _logger;
 
+        const string kSessionLoginKey = "SessionLoginKey";
+
         public WeatherForecastController(ILogger<WeatherForecastController> logger)
         {
             _logger = logger;
         }
 
         [HttpGet]
-        public IEnumerable<WeatherForecast> Get()
+        public IActionResult Get()
         {
+            if (HttpContext.Session.GetInt32(kSessionLoginKey) != 1)
+                return Unauthorized();
+
             var rng = new Random();
             var data = Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
@@ -35,14 +41,19 @@ namespace vsReact.Controllers
             })
             .ToArray();
 
-            return data;
+            return Ok(data);
         }
 
         [HttpPost]
         public ActionResult Post(LoginData data)
         {
             if (data == null && data.Username != "hello@world")
+            {
+                HttpContext.Session.SetInt32(kSessionLoginKey, 0);
                 return Unauthorized();
+            }
+
+            HttpContext.Session.SetInt32(kSessionLoginKey, 1);
 
             return Ok(new { 
                 Message="Successful login"
